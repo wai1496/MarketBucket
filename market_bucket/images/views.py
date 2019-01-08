@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, escape, sessions
 from flask_login import login_required, current_user
-from omni_marketplace.images.forms import UploadForm, EditCaptionForm, DeleteForm
-from omni_marketplace.helpers.helpers import allowed_file, upload_image
+from market_bucket.images.forms import UploadForm, EditCaptionForm, DeleteForm
+from market_bucket.helpers.helpers import allowed_file, upload_image
 from werkzeug.utils import secure_filename
-from omni_marketplace.images.model import Image, db
+from market_bucket.images.model import Image, db
 import random
 
 images_blueprint = Blueprint('images',

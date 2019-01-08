@@ -1,8 +1,8 @@
 import re
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
-from omni_marketplace import db
-from omni_marketplace.helpers.helpers import validation_preparation
+from market_bucket import db
+from market_bucket.helpers.helpers import validation_preparation
 import re
 
 

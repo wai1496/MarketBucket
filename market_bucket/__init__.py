@@ -17,12 +17,12 @@ db = SQLAlchemy(app, session_options={"autoflush": False})
 
 Migrate(app, db)
 
+# login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "sessions.new"
 login_manager.session_protection = "basic"
 login_manager.login_message = "Please login to Omni-marketplace first"
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -55,7 +55,7 @@ google = oauth.register('google',
                         )
 
 lazada = oauth.register('lazada',
-                        client_id=config.LAZADA_TEST_KEY,
+                        client_id=config.LAZADA_MARKET_KEY,
                         authorize_url='https://auth.lazada.com/oauth/authorize',
                         client_kwargs={
                             'scope': '',
@@ -85,6 +85,8 @@ app.config['S3_SECRET'] = S3_SECRET
 # Lazada app keys
 LAZADA_TEST_KEY = config.LAZADA_TEST_KEY
 LAZADA_TEST_SECRET = config.LAZADA_TEST_SECRET
+LAZADA_MARKET_KEY = config.LAZADA_MARKET_KEY
+LAZADA_MARKET_SECRET = config.LAZADA_MARKET_SECRET
 
 # Home Page
 @app.route("/")
@@ -97,11 +99,11 @@ def home():
 
 # Grab the blueprints from the other views.py files for each "app"
 # make sure route and method is defined in views.py
-from omni_marketplace.users.views import users_blueprint
-from omni_marketplace.sessions.views import sessions_blueprint
-from omni_marketplace.images.views import images_blueprint
-from omni_marketplace.marketplaces.views import marketplaces_blueprint
-from omni_marketplace.products.views import products_blueprint
+from market_bucket.users.views import users_blueprint
+from market_bucket.sessions.views import sessions_blueprint
+from market_bucket.images.views import images_blueprint
+from market_bucket.marketplaces.views import marketplaces_blueprint
+from market_bucket.products.views import products_blueprint
 
 app.register_blueprint(users_blueprint, url_prefix="/users")
 app.register_blueprint(sessions_blueprint, url_prefix='/')
@@ -122,6 +124,6 @@ css = Bundle('css/vendor/bootstrap_4.1.1.css', 'css/style.css',
 assets.register({'js_all': js, 'css_all': css})
 
 # import user, image & marketplace models so that you can run migration
-from omni_marketplace.users.model import User
-from omni_marketplace.marketplaces.model import Marketplace
-from omni_marketplace.images.model import Image
+from market_bucket.users.model import User
+from market_bucket.marketplaces.model import Marketplace
+from market_bucket.images.model import Image

@@ -1,8 +1,8 @@
-from omni_marketplace.marketplaces.model import Marketplace, db
+from market_bucket.marketplaces.model import Marketplace, db
 from flask import redirect, url_for, render_template, Blueprint, flash, request
 from flask_login import current_user, login_required
-from omni_marketplace.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
-from omni_marketplace import LAZADA_TEST_KEY, LAZADA_TEST_SECRET, LAZADA_REDIRECT_URI, lazada, oauth
+from market_bucket.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
+from market_bucket import LAZADA_TEST_KEY, LAZADA_TEST_SECRET, LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, oauth
 
 marketplaces_blueprint = Blueprint(
     'marketplaces', __name__, template_folder='templates')
@@ -11,14 +11,16 @@ marketplaces_blueprint = Blueprint(
 @marketplaces_blueprint.route('/check/lazada')
 @login_required
 def lazada_authorize():
+    import pdb; pdb.set_trace()
     return lazada.authorize_redirect(LAZADA_REDIRECT_URI, _external=True)
 
 
 @marketplaces_blueprint.route('/authorize/lazada')
 def lazada_authorize_login():
+    import pdb; pdb.set_trace()
     code = request.args.get('code')
     client = LazopClient("https://auth.lazada.com/rest",
-                         LAZADA_TEST_KEY, LAZADA_TEST_SECRET)
+                         LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET)
     api_request = LazopRequest("/auth/token/create")
     api_request.add_api_param("code", code)
     response = client.execute(api_request)
@@ -49,7 +51,7 @@ def lazada_authorize_login():
 @marketplaces_blueprint.route('/check/<order>/lazada')
 def check_order(order):
     client = LazopClient("https://api.lazada.com.my/rest",
-                         LAZADA_TEST_KEY, LAZADA_TEST_SECRET)
+                         LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET)
     request = LazopRequest('/order/get', 'GET')
     request.add_api_param('order_id', str(order))
     response = client.execute(

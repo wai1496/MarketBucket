@@ -1,5 +1,5 @@
 import os
-from omni_marketplace import S3_KEY, S3_SECRET, S3_BUCKET
+from market_bucket import S3_KEY, S3_SECRET, S3_BUCKET
 import boto3
 import botocore
 from flask import redirect, url_for

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, escape, sessions
-from omni_marketplace.users.forms import SignupForm
-from omni_marketplace.users.model import User, db
-from omni_marketplace.marketplaces.model import Marketplace
+from market_bucket.users.forms import SignupForm
+from market_bucket.users.model import User, db
+from market_bucket.marketplaces.model import Marketplace
 from flask_login import login_user, logout_user, login_required, login_url, current_user
 
 users_blueprint = Blueprint('users',
