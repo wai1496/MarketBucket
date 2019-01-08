@@ -1,0 +1,27 @@
+{% extends "_base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block custom_head %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <h1>Welcome to the one and only store</h1>
+
+  {% if current_user.is_authenticated %}
+  <h1>Great job, you signed up, {{current_user.first_name}}. Now What?! ...</h1>
+  <a href="{{ url_for('sessions.logout') }}" class="btn btn-primary">Sign out!</a>
+  <a href="{{ url_for('images.new', id = current_user.id) }}" class="btn btn-primary">Upload Images!</a>
+  <a href="{{ url_for('marketplaces.lazada_authorize') }}" class="btn btn-primary">Lazada!</a>
+  {% else %}
+  <a href="{{ url_for('users.new') }}" class="btn btn-primary">Sign up!</a>
+  <a href="{{ url_for('sessions.new') }}" class="btn btn-primary">Sign in!</a>
+  <a href="{{ url_for('sessions.google_authorize') }}" class="btn btn-primary">Sign up/in with google!</a>
+  {% endif %}
+</div>
+
+{% endblock %}

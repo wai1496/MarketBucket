@@ -1,0 +1,106 @@
+{% extends "_base.html" %}
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+
+<a href="{{ url_for('sessions.logout') }}" class="btn btn-primary">Sign out!</a>
+<a href="{{ url_for('images.new', id = current_user.id) }}" class="btn btn-primary">Upload Images!</a>
+<a href="{{ url_for('marketplaces.check_order', order = 212531555296229) }}" class="btn btn-primary">Check Order!</a>
+<a href="{{ url_for('products.new_product', marketplace='lazada') }}" class="btn btn-primary">New Product!</a>
+<h1>Great job, you're in, {{current_user.first_name}}. Now What?! ...</h1>
+
+<div class="container h-100">
+  <div class="row h-100">
+    <!-- CARD SECTION -->
+    <div class="card d-inline-block text-center h-50 m-2" style="width: 18rem;">
+      <button type="button" class="btn p-0" data-toggle="modal" data-target="#Modal">
+        <i class="fas fa-plus fa-7x"></i>
+      </button>
+      <div class="card-body">
+        <h5 class="card-title">Add a marketplace</h5>
+        <p class="card-text">Choose the marketplace you would like to add and enter your credentials when prompted</p>
+      </div>
+    </div>
+    <!-- /CARD SECTION -->
+
+    <!-- LAZADA CARD SECTION -->
+    {% if Marketplace.query.filter(Marketplace.marketplace_name=="lazada",
+    Marketplace.user_id==current_user.id).first() %}
+    <div class="card d-inline-block text-center h-50 m-2" style="width: 18rem;">
+      <a href="" class="p-0">
+        <img class="mb-4" width="250px" src="./../../../static/images/Lazada.jpg" alt="Lazada">
+      </a>
+      <div class="card-body">
+        <h5 class="card-title">Lazada</h5>
+        <p class="card-text">Stats</p>
+      </div>
+    </div>
+    {% endif %}
+    <!-- / LAZADA CARD SECTION -->
+
+    <!-- Shopee CARD SECTION -->
+    {% if Marketplace.query.filter(Marketplace.marketplace_name=="shopee",
+    Marketplace.user_id==current_user.id).first() %}
+    <div class="card d-inline-block text-center h-50 m-2" style="width: 18rem;">
+      <a href="" class="p-0">
+        <img width="250px" src="./../../../static/images/shopee.png" alt="Shopee">
+      </a>
+      <div class="card-body">
+        <h5 class="card-title">Shopee</h5>
+        <p class="card-text">Stats</p>
+      </div>
+    </div>
+    {% endif %}
+    <!-- / Shopee CARD SECTION -->
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalLabel">Marketplace List</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ul style="list-style-type:none">
+          <li>
+            {% if Marketplace.query.filter(Marketplace.marketplace_name=="lazada",
+            Marketplace.user_id==current_user.id).first() %}
+            <img height="100px" src="./../../../static/images/Lazada.jpg" alt="Lazada">
+            {% else %}
+            <a href="{{ url_for('marketplaces.lazada_authorize') }}" class="btn"><img height="100px" src="./../../../static/images/Lazada.jpg"
+                alt="Lazada"></a>
+            {% endif %}
+          </li>
+          <hr>
+          <li>
+            {% if Marketplace.query.filter(Marketplace.marketplace_name=="shopee",
+            Marketplace.user_id==current_user.id).first() %}
+            <img height="100px" src="./../../../static/images/shopee.png" alt="Shopee">
+            {% else %}
+            <a href="" class="btn"><img height="100px" src="./../../../static/images/shopee.png" alt="Shopee"></a>
+            {% endif %}
+          </li>
+          <hr>
+          <li>
+            More marketplaces coming soon...
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Modal -->
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "_base.html" %}
+
+{% block title %}
+User Sign-in
+{% endblock %}
+
+
+{% block content %}
+
+<!-- LOGIN SECTION -->
+<section class="h-100" id="login-page">
+  <div class="container-fluid h-100">
+    <div class="row h-100">
+      <div class="col-md-7 h-100 d-none d-md-block" id="login-left-banner">
+        <div class="mb-auto mt-3">
+          <img src="../../../static/images/logo.png" height="40px" alt="">
+        </div>
+      </div>
+      <div class="col-md-5 h-100 d-flex align-items-start flex-column" id="login-right-banner">
+        <div class="mb-auto m-5">
+          <h1>Login</h1>
+          <p>Hello! Let's get started!</p>
+        </div>
+        <form class="mb-auto w-100 p-5" action="{{ url_for('sessions.authenticate', next = request.args.get('next')) }}"
+          method="POST">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            {{ form.email (class='form-control border-top-0 border-left-0 border-right-0
+            bg-transparent',placeholder="Email")}}
+          </div>
+          <div class="form-group">
+            {{ form.password (class='form-control border-top-0 border-left-0 border-right-0
+            bg-transparent',placeholder="Password")}}
+          </div>
+          <div class="d-flex flex-row mt-3 ml-1">
+            {{ form.submit (class='btn btn-dark',value="Login")}}
+            <a href="{{ url_for('sessions.google_authorize') }}" class="btn btn-primary h-50 ml-1" id="google-button">
+              <i class="fab fa-google"></i>
+            </a>
+          </div>
+        </form>
+        <div class="mt-auto mx-auto mb-3">
+          <small class="text-muted">
+            <a class="text-muted border-bottom" href="{{url_for('users.new')}}">Don't have an account yet? Sign up here!</a>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /LOGIN SECTION -->
+
+{% endblock %}
