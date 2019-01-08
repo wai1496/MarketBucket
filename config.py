@@ -34,6 +34,8 @@ class DevelopmentConfig(Config):
     S3_SECRET = os.environ['S3_SECRET_ACCESS_KEY']
     LAZADA_TEST_KEY = os.environ['LAZADA_TEST_APP_KEY']
     LAZADA_TEST_SECRET = os.environ['LAZADA_TEST_APP_SECRET']
+    LAZADA_MARKET_KEY = os.environ['LAZADA_MARKET_APP_KEY']
+    LAZADA_MARKET_SECRET = os.environ['LAZADA_MARKET_APP_SECRET']
 
 
 class TestingConfig(Config):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import omni_marketplace.helpers.lazada_sdk.lazop 
+import market_bucket.helpers.lazada_sdk.lazop 
 
 # params 1 : gateway url
 # params 2 : appkey

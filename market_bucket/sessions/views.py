@@ -1,8 +1,8 @@
-from omni_marketplace.users.model import User
-from omni_marketplace.sessions.forms import LogInForm
+from market_bucket.users.model import User
+from market_bucket.sessions.forms import LogInForm
 from flask_login import login_user, current_user, login_required, logout_user
 from flask import redirect, url_for, render_template, Blueprint, flash, request
-from omni_marketplace import oauth, google, GOOGLE_REDIRECT_URI, db
+from market_bucket import oauth, google, GOOGLE_REDIRECT_URI, db
 import random
 
 sessions_blueprint = Blueprint(
@@ -25,7 +25,7 @@ def authenticate():
     user = User.query.filter_by(email=form.email.data.lower()).first()
 
     if user and user.check_password(form.password.data):
-        login_user(user, remember=False)
+        login_user(user)
         flash('Logged in successfully')
         next = request.args.get('next')
         # change redirect destination later
@@ -57,7 +57,7 @@ def google_authorize_login():
         'https://www.googleapis.com/oauth2/v2/userinfo').json()['email']
     user = User.query.filter_by(email=email).first()
     if user:
-        login_user(user)
+        login_user(user, remember=False)
         flash('logged in successfully')
         return redirect(url_for('home'))  # change redirect destination later
     else:
@@ -78,7 +78,7 @@ def google_authorize_login():
 
         db.session.add(new_user)
         db.session.commit()
-        login_user(new_user)
+        login_user(new_user, remember=False)
         flash('Omni-marketplace account created successfully!')
         flash('Please create a password for your Omni-marketplace account from the Settings tab')
         # send_signup_email(new_user.email)

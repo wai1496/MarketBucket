@@ -1,4 +1,4 @@
-from omni_marketplace import db, S3_LOCATION
+from market_bucket import db, S3_LOCATION
 
 
 class Image(db.Model):
