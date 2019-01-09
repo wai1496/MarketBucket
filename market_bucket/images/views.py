@@ -26,7 +26,7 @@ def upload(id):
         # check there is a file
         form = UploadForm()
         if "user_image" not in request.files:
-            flash("No photo was uploaded!")
+            flash("No image was uploaded!")
             return render_template('images/upload.html', form=form)
 
         # grab the photo and caption

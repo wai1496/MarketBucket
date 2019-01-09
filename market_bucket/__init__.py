@@ -123,7 +123,8 @@ css = Bundle('css/vendor/bootstrap_4.1.1.css', 'css/style.css',
 
 assets.register({'js_all': js, 'css_all': css})
 
-# import user, image & marketplace models so that you can run migration
+# import user, image, product & marketplace models so that you can run migration
 from market_bucket.users.model import User
 from market_bucket.marketplaces.model import Marketplace
 from market_bucket.images.model import Image
+from market_bucket.products.model import Product

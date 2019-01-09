@@ -7,12 +7,14 @@ class Image(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     image_name = db.Column(db.Text, nullable=False)
     image_caption = db.Column(db.Text, nullable=True)
     image_url = db.Column(db.Text, nullable=False)
 
-    def __init__(self, user_id, image_name, image_caption=None, image_url=None):
+    def __init__(self, user_id, product_id, image_name, image_caption=None, image_url=None):
         self.user_id = user_id
+        self.product_id = product_id
         self.image_name = image_name
         self.image_caption = image_caption
         self.image_url = f'{S3_LOCATION}{self.image_name}'
