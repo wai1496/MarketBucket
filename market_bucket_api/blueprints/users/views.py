@@ -12,7 +12,7 @@ def index():
     users = User.query.all()
 
     # there is probably a more efficient to do this
-    users = [{"id": int(user.id), "company_name": user.company_name, "description": user.description,
+    users = [{"id": int(user.id), "store_name": user.store_name, "description": user.description,
               "email": user.email, "first_name": user.first_name, "last_name": user.last_name} for user in users]
 
     return jsonify(users)
