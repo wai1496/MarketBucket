@@ -1,11 +1,12 @@
-import re
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from market_bucket import db
+from market_bucket import db, app
 from market_bucket.helpers.helpers import validation_preparation
 import re
+import datetime
+import jwt
 
 
 class User(db.Model, UserMixin):
@@ -22,6 +23,10 @@ class User(db.Model, UserMixin):
     company_logo = db.Column(db.String())
     marketplaces = db.relationship(
         "Marketplace", backref="users", cascade="delete, delete-orphan")
+    images = db.relationship("Image", backref="users", lazy=True,
+                             order_by="desc(Image.id)", cascade="delete, delete-orphan")
+    products = db.relationship("Product", backref="users",
+                             order_by="desc(Product.id)", cascade="delete, delete-orphan")
 
     def __init__(self, store_name, first_name, last_name, email, password):
         self.first_name = first_name
@@ -71,7 +76,7 @@ class User(db.Model, UserMixin):
         if not email:
             self.validation_errors.append('No email provided')
 
-        if not re.match("[^@]+@[^@]+\.[^@]+", email):
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             self.validation_errors.append(
                 'Provided email is not an email address')
 
@@ -93,3 +98,38 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def encode_auth_token(self, user_id):
+        """
+        Generates the Auth Token
+        :return: string
+        """
+        try:
+            payload = {
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=0),
+                'iat': datetime.datetime.utcnow(),
+                'sub': user_id
+            }
+            return jwt.encode(
+                payload,
+                app.config.get('SECRET_KEY'),
+                algorithm='HS256'
+            )
+        except Exception as e:
+            print(e)
+            return e
+
+    @staticmethod
+    def decode_auth_token(auth_token):
+        """
+        Decodes the auth token
+        :param auth_token:
+        :return: integer|string
+        """
+        try:
+            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return 0
+        except jwt.InvalidTokenError:
+            return 0

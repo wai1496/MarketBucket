@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask_assets import Bundle, Environment
 from authlib.flask.client import OAuth
-
+import sendgrid
 import config
 
 app = Flask(__name__)
@@ -82,6 +82,10 @@ app.config['S3_BUCKET'] = S3_BUCKET
 app.config['S3_KEY'] = S3_KEY
 app.config['S3_SECRET'] = S3_SECRET
 
+# Sendgrid mailing service setup
+SENDGRID_API_KEY = config.SENDGRID_API_KEY
+sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
+
 # Lazada app keys
 LAZADA_TEST_KEY = config.LAZADA_TEST_KEY
 LAZADA_TEST_SECRET = config.LAZADA_TEST_SECRET
@@ -97,6 +101,12 @@ def home():
         return render_template('home.html')
 
 
+# import user, image, product & marketplace models so that you can run migration
+from market_bucket.users.model import User
+from market_bucket.marketplaces.model import Marketplace
+from market_bucket.images.model import Image
+from market_bucket.products.model import Product
+
 # Grab the blueprints from the other views.py files for each "app"
 # make sure route and method is defined in views.py
 from market_bucket.users.views import users_blueprint
@@ -104,6 +114,7 @@ from market_bucket.sessions.views import sessions_blueprint
 from market_bucket.images.views import images_blueprint
 from market_bucket.marketplaces.views import marketplaces_blueprint
 from market_bucket.products.views import products_blueprint
+import market_bucket_api
 
 app.register_blueprint(users_blueprint, url_prefix="/users")
 app.register_blueprint(sessions_blueprint, url_prefix='/')
@@ -122,8 +133,3 @@ css = Bundle('css/vendor/bootstrap_4.1.1.css', 'css/style.css',
              filters='cssmin', output='gen/packed.%(version)s.css')
 
 assets.register({'js_all': js, 'css_all': css})
-
-# import user, image & marketplace models so that you can run migration
-from market_bucket.users.model import User
-from market_bucket.marketplaces.model import Marketplace
-from market_bucket.images.model import Image
