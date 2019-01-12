@@ -12,8 +12,8 @@ class Product(db.Model):
     price = db.Column(db.Numeric(), nullable=False)
     description = db.Column(db.Text)
     images = db.relationship("Image", backref="products", lazy=True,
-                             order_by="desc(Medium.id)", cascade="delete, delete-orphan")
-    
+                             order_by="desc(Image.id)", cascade="delete, delete-orphan")
+
     def __init__(self, user_id, marketplace_id, product_name, stock, price, description=None):
         self.user_id = user_id
         self.marketplace_id = marketplace_id

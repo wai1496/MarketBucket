@@ -52,6 +52,7 @@ def upload(id):
 
             new_image = Image(
                 user_id=id,
+                product_id=1,  #hard coded for testing
                 image_name=str(file.filename),
                 image_caption=caption
             )

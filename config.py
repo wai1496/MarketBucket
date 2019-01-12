@@ -36,6 +36,7 @@ class DevelopmentConfig(Config):
     LAZADA_TEST_SECRET = os.environ['LAZADA_TEST_APP_SECRET']
     LAZADA_MARKET_KEY = os.environ['LAZADA_MARKET_APP_KEY']
     LAZADA_MARKET_SECRET = os.environ['LAZADA_MARKET_APP_SECRET']
+    SENDGRID_API_KEY = os.environ['SENDGRID_API_KEY']
 
 
 class TestingConfig(Config):

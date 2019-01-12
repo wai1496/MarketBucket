@@ -24,7 +24,7 @@ def create():
     post_data = request.get_json()
 
     new_user = User(
-        company_name=post_data.get('company_name'),
+        store_name=post_data.get('store_name'),
         first_name=post_data.get('first_name'),
         last_name=post_data.get('last_name'),
         email=post_data.get('email').lower(),

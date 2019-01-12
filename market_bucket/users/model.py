@@ -24,7 +24,7 @@ class User(db.Model, UserMixin):
     marketplaces = db.relationship(
         "Marketplace", backref="users", cascade="delete, delete-orphan")
     images = db.relationship("Image", backref="users", lazy=True,
-                             order_by="desc(Medium.id)", cascade="delete, delete-orphan")
+                             order_by="desc(Image.id)", cascade="delete, delete-orphan")
     products = db.relationship("Product", backref="users",
                              order_by="desc(Product.id)", cascade="delete, delete-orphan")
 
