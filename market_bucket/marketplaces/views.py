@@ -11,13 +11,11 @@ marketplaces_blueprint = Blueprint(
 @marketplaces_blueprint.route('/check/lazada')
 @login_required
 def lazada_authorize():
-    import pdb; pdb.set_trace()
     return lazada.authorize_redirect(LAZADA_REDIRECT_URI, _external=True)
 
 
 @marketplaces_blueprint.route('/authorize/lazada')
 def lazada_authorize_login():
-    import pdb; pdb.set_trace()
     code = request.args.get('code')
     client = LazopClient("https://auth.lazada.com/rest",
                          LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET)
