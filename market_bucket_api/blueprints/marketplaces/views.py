@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request, make_response
 from market_bucket.marketplaces.model import Marketplace, db
 import simplejson as json
-from market_bucket import LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, oauth, User
+from market_bucket import LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, shopee, oauth, User
 from market_bucket.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
 
 marketplaces_api_blueprint = Blueprint('marketplaces_api',
@@ -95,3 +95,7 @@ def lazada_authorize_login():
             'message': 'Authentication failed'
         }
         return make_response(jsonify(responseObject)), 401
+
+@marketplaces_api_blueprint.route('/check/shopee', methods=['GET'])
+def shopee_authorize():
+    return shopee.authorize_redirect(_external=True)

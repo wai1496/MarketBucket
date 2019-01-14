@@ -36,6 +36,11 @@ class DevelopmentConfig(Config):
     LAZADA_TEST_SECRET = os.environ['LAZADA_TEST_APP_SECRET']
     LAZADA_MARKET_KEY = os.environ['LAZADA_MARKET_APP_KEY']
     LAZADA_MARKET_SECRET = os.environ['LAZADA_MARKET_APP_SECRET']
+    SHOPEE_TEST_ID = os.environ['SHOPEE_TEST_ID']
+    SHOPEE_TEST_KEY = os.environ['SHOPEE_TEST_KEY']
+    SHOPEE_APP_ID = os.environ['SHOPEE_APP_ID']
+    SHOPEE_APP_KEY = os.environ['SHOPEE_APP_KEY']
+    SHOPEE_APP_TOKEN = os.environ['SHOPEE_APP_TOKEN']
     SENDGRID_API_KEY = os.environ['SENDGRID_API_KEY']
 
 
