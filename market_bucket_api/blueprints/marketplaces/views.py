@@ -3,6 +3,7 @@ from market_bucket.marketplaces.model import Marketplace, db
 import simplejson as json
 from market_bucket import LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, shopee, oauth, User
 from market_bucket.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
+from market_bucket.helpers.sendgrid import send_new_marketplace_email
 
 marketplaces_api_blueprint = Blueprint('marketplaces_api',
                                        __name__,
@@ -78,6 +79,7 @@ def lazada_authorize_login():
 
         db.session.add(new_marketplace)
         db.session.commit()
+        send_new_marketplace_email(user.email,user_id,"Lazada")
 
         responseObject = {
             'status': 'success',
@@ -130,6 +132,7 @@ def shopee_authorize_login():
 
         db.session.add(new_marketplace)
         db.session.commit()
+        send_new_marketplace_email(user.email,user_id,"Shopee")
 
         responseObject = {
             'status': 'success',
