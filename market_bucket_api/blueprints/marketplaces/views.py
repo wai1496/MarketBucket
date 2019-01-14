@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request, make_response
 from market_bucket.marketplaces.model import Marketplace, db
 import simplejson as json
-from market_bucket import LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, oauth, User
+from market_bucket import LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, shopee, oauth, User
 from market_bucket.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
 
 marketplaces_api_blueprint = Blueprint('marketplaces_api',
@@ -78,13 +78,63 @@ def lazada_authorize_login():
 
         db.session.add(new_marketplace)
         db.session.commit()
-        del new_marketplace.__dict__['_sa_instance_state']
 
         responseObject = {
             'status': 'success',
             'message': 'Marketplaces connected successfully',
-            'marketplace': new_marketplace.__dict__,
+            'lazada_refresh': refresh_token,
             'lazada_token': access_token
+        }
+
+        return make_response(jsonify(responseObject)), 201
+
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'Authentication failed'
+        }
+        return make_response(jsonify(responseObject)), 401
+
+@marketplaces_api_blueprint.route('/check/shopee', methods=['GET'])
+def shopee_authorize():
+    return shopee.authorize_redirect(_external=True)
+
+@marketplaces_api_blueprint.route('/authorize/shopee', methods=['POST'])
+def shopee_authorize_login():
+    shop_id = request.get_json().get('shop_id')
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'No authorization header found'
+        }
+
+        return make_response(jsonify(responseObject)), 401
+
+    user_id = User.decode_auth_token(auth_token)
+
+    user = User.query.get(user_id)
+
+    if user:
+
+        new_marketplace = Marketplace(
+            user_id=user_id,
+            marketplace_name="shopee",
+            shop_id=shop_id,
+            shop_name="",
+            access_token="",
+            refresh_token=""
+        )
+
+        db.session.add(new_marketplace)
+        db.session.commit()
+
+        responseObject = {
+            'status': 'success',
+            'message': 'Marketplaces connected successfully',
+            'shopee_shop_id': shop_id
         }
 
         return make_response(jsonify(responseObject)), 201

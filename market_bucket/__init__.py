@@ -64,11 +64,16 @@ lazada = oauth.register('lazada',
                             'prompt': 'consent'
                         }
                         )
-#                       EXAMPLE_CLIENT_KWARGS = {
-#     'signature_method': 'HMAC-SHA1',
-#     'signature_type': 'HEADER',
-#     'rsa_key': 'Your-RSA-Key'
-# }
+
+shopee = oauth.register('shopee',
+                        authorize_url=f'https://partner.shopeemobile.com/api/v1/shop/auth_partner?id={config.SHOPEE_APP_ID}&token={config.SHOPEE_APP_TOKEN}&redirect=https://www.localhost:3000/',
+                        client_kwargs={
+                            'scope': '',
+                            'token_endpoint_auth_method': 'client_secret_basic',
+                            'token_placement': 'header',
+                            'prompt': 'consent'
+                        }
+                        )
 
 oauth.init_app(app)
 
