@@ -1,16 +1,56 @@
 from flask import jsonify, Blueprint, request, make_response
 import simplejson as json
-from market_bucket import User, Product, db
+from market_bucket import User, Product, Marketplace, db, LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET
 # from market_bucket.helpers.sendgrid import send_bid_email
+from market_bucket.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
 
 products_api_blueprint = Blueprint('products_api',
                                __name__,
                                template_folder='templates')
 
 
-@products_api_blueprint.route('/lazada', methods=['POST'])
+@products_api_blueprint.route('/lazada', methods=['GET'])
 def lazada_products():
-    pass
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'No authorization header found'
+        }
+
+        return make_response(jsonify(responseObject)), 401
+
+    user_id = User.decode_auth_token(auth_token)
+    user = User.query.get(user_id)
+
+    if user:
+        access_token = Marketplace.query.filter_by(user_id = user_id, marketplace_name='lazada').first().access_token
+        refresh_token = Marketplace.query.filter_by(user_id = user_id, marketplace_name='lazada').first().refresh_token
+        client = LazopClient('https://api.lazada.com.my/rest', LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET)
+        laz_request = LazopRequest('/products/get','GET')
+        laz_request.add_api_param('filter', 'live')
+        laz_request.add_api_param('limit', '10')
+        laz_request.add_api_param('options', '1')
+        response = client.execute(laz_request, access_token)
+        products = response.body['data']
+
+        responseObject = {
+            'status': 'success',
+            'message': 'all products returned',
+            'products': products
+        }
+
+        return make_response(jsonify(responseObject)), 201
+
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'Authentication failed'
+        }
+
+        return make_response(jsonify(responseObject)), 401
 
 # @products_api_blueprint.route('/', methods=['GET'])
 # def index():
