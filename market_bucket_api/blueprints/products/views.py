@@ -8,6 +8,10 @@ products_api_blueprint = Blueprint('products_api',
                                template_folder='templates')
 
 
+@products_api_blueprint.route('/lazada', methods=['POST'])
+def lazada_products():
+    pass
+
 # @products_api_blueprint.route('/', methods=['GET'])
 # def index():
 #     bids = Bid.query.all()
