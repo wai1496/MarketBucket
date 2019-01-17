@@ -104,11 +104,54 @@ def shopee_products():
                 endpoint, headers=headers, data=request_body)
             products.append(response.json()['item'])
 
-        breakpoint()
         responseObject = {
             'status': 'success',
             'message': 'all products returned',
             'products': products
+        }
+
+        return make_response(jsonify(responseObject)), 200
+
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'Authentication failed'
+        }
+
+        return make_response(jsonify(responseObject)), 401
+
+
+@products_api_blueprint.route('/lazada/tree', methods=['GET'])
+def lazada_category_tree():
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'No authorization header found'
+        }
+
+        return make_response(jsonify(responseObject)), 401
+
+    user_id = User.decode_auth_token(auth_token)
+    user = User.query.get(user_id)
+
+    if user:
+        access_token = Marketplace.query.filter_by(
+            user_id=user_id, marketplace_name='lazada').first().access_token
+        refresh_token = Marketplace.query.filter_by(
+            user_id=user_id, marketplace_name='lazada').first().refresh_token
+        client = LazopClient('https://api.lazada.com.my/rest',
+                             LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET)
+        laz_request = LazopRequest('/category/tree/get', 'GET')
+        response = client.execute(laz_request)
+        tree = response.body['data']
+
+        responseObject = {
+            'status': 'success',
+            'message': 'category tree returned',
+            'tree': tree
         }
 
         return make_response(jsonify(responseObject)), 200
