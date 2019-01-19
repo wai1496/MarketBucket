@@ -1,13 +1,16 @@
 from flask import jsonify, Blueprint, request, make_response
 import simplejson as json
-from market_bucket import User, Product, Marketplace, db, LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, SHOPEE_APP_ID, SHOPEE_APP_KEY
+from market_bucket import User, Product, Marketplace, Image, db, LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, SHOPEE_APP_ID, SHOPEE_APP_KEY
 # from market_bucket.helpers.sendgrid import send_bid_email
 from market_bucket.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
 import time
+import random
 import requests
 import hmac
 import hashlib
 from market_bucket.helpers.sendgrid import send_new_product_email
+from market_bucket.helpers.helpers import upload_image, allowed_file
+from werkzeug.utils import secure_filename
 
 
 products_api_blueprint = Blueprint('products_api',
@@ -311,27 +314,69 @@ def shopee_new_product():
     user = User.query.get(user_id)
 
     if user:
-        post_data = request.get_json()
-        category_id = post_data.get('id')
-        name = post_data.get('name')
-        description = post_data.get('description')
-        price = post_data.get('price')
-        quantity = post_data.get('quantity')
-        weight = post_data.get('package_weight')
-        attribute1 = post_data.get('attribute1')
-        attribute2 = post_data.get('attribute2')
-        attribute3 = post_data.get('attribute3')
-        if attribute2 == {}:
-            attributes = [attribute1]
-        elif attribute3 == {}:
-            attributes = [attribute1, attribute2]
+        form = request.form
+        category_id = form.get('id')
+        name = form.get('name')
+        description = form.get('description')
+        price = form.get('price')
+        quantity = form.get('quantity')
+        weight = form.get('package_weight')
+        attribute1_id = int(form.get('attribute1Id'))
+        attribute2_id = int(form.get('attribute2Id'))
+        attribute3_id = int(form.get('attribute3Id'))
+        attribute1_value = form.get('attribute1Value')
+        attribute2_value = form.get('attribute2Value')
+        attribute3_value = form.get('attribute3Value')
+        if attribute2_id == {}:
+            attributes = [
+                {"attributes_id": attribute1_id, "value": attribute1_value}]
+        elif attribute3_id == {}:
+            attributes = [{"attributes_id": attribute1_id, "value": attribute1_value}, {
+                "attributes_id": attribute2_id, "value": attribute2_value}]
         else:
-            attributes = [attribute1, attribute2, attribute3]
+            attributes = [{"attributes_id": attribute1_id, "value": attribute1_value}, {
+                "attributes_id": attribute2_id, "value": attribute2_value}, {"attributes_id": attribute3_id, "value": attribute3_value}]
+        # grab the file
+        file = request.files["image"]
+
+        # check file size
+        if len(file.read()) > (2 * 1024 * 1024):
+
+            responseObject = {
+                'status': 'fail',
+                'message': "Max size allowed is 2 MB"
+            }
+
+            return make_response(jsonify(responseObject)), 400
+
+        # check correct extension and upload if valid
+        if file and allowed_file(file.filename):
+            file.seek(0)
+            serial_filename = f'{user_id}.{name}.{random.randint(1,100000)}.{file.filename}'
+            file.filename = secure_filename(serial_filename)
+            upload_image(file)
+
+            new_image = Image(
+                user_id=user_id,
+                image_name=str(file.filename),
+            )
+
+            db.session.add(new_image)
+            db.session.commit()
+
+        else:
+
+            responseObject = {
+                'status': 'fail',
+                'message': "Image format not supported"
+            }
+
+            return make_response(jsonify(responseObject)), 400
 
         shop_id = Marketplace.query.filter_by(
             user_id=user_id, marketplace_name='shopee').first().shop_id
         endpoint = "https://partner.shopeemobile.com/api/v1/item/add"
-        request_body = json.dumps({"shopid": shop_id, "category_id": category_id, 'name': name, 'description': description, 'price': int(price), 'stock': int(quantity), 'images': [{'url': 'https://cdn1.ebags.com/is/image/im3/334833_1_1?resmode=4&op_usm=1,1,1,&qlt=70,1&hei=600&wid=600&align=0,1'}], "attributes": attributes, "logistics": [{"logistic_id": 29210, "enabled": True}], "weight": int(weight), "partner_id": int(SHOPEE_APP_ID), "timestamp": int(
+        request_body = json.dumps({"shopid": shop_id, "category_id": int(category_id), 'name': name, 'description': description, 'price': int(price), 'stock': int(quantity), 'images': [{'url': new_image.image_url}], "attributes": attributes, "logistics": [{"logistic_id": 29210, "enabled": True}], "weight": int(weight), "partner_id": int(SHOPEE_APP_ID), "timestamp": int(
             time.time())})
         signature = hmac.new(
             key=bytes(SHOPEE_APP_KEY, encoding="ascii"),
@@ -343,19 +388,21 @@ def shopee_new_product():
 
         try:
             response.json()['item_id']
+
         except:
+            responseObject = {
+                'status': 'failed',
+                'message': response.json(),
+            }
+        else:
             send_new_product_email(user.email, user_id, name)
             responseObject = {
                 'status': 'success',
                 'message': response.json(),
             }
-        else:
-            responseObject = {
-                'status': 'failed',
-                'message': response.json(),
-            }
 
         return make_response(jsonify(responseObject)), 200
+
     else:
         responseObject = {
             'status': 'failed',
