@@ -18,7 +18,7 @@ def validation_preparation(func):
 
 
 # Image upload helpers
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'tiff'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 
 def allowed_file(filename):
