@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     images = db.relationship("Image", backref="users", lazy=True,
                              order_by="desc(Image.id)", cascade="delete, delete-orphan")
     products = db.relationship("Product", backref="users",
-                             order_by="desc(Product.id)", cascade="delete, delete-orphan")
+                               order_by="desc(Product.id)", cascade="delete, delete-orphan")
 
     def __init__(self, store_name, first_name, last_name, email, password):
         self.first_name = first_name
@@ -76,7 +76,7 @@ class User(db.Model, UserMixin):
         if not email:
             self.validation_errors.append('No email provided')
 
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             self.validation_errors.append(
                 'Provided email is not an email address')
 
