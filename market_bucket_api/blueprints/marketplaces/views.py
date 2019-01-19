@@ -79,7 +79,7 @@ def lazada_authorize_login():
 
         db.session.add(new_marketplace)
         db.session.commit()
-        send_new_marketplace_email(user.email,user_id,"Lazada")
+        send_new_marketplace_email(user.email, user_id, "Lazada")
 
         responseObject = {
             'status': 'success',
@@ -97,9 +97,11 @@ def lazada_authorize_login():
         }
         return make_response(jsonify(responseObject)), 401
 
+
 @marketplaces_api_blueprint.route('/check/shopee', methods=['GET'])
 def shopee_authorize():
     return shopee.authorize_redirect(_external=True)
+
 
 @marketplaces_api_blueprint.route('/authorize/shopee', methods=['POST'])
 def shopee_authorize_login():
@@ -132,12 +134,51 @@ def shopee_authorize_login():
 
         db.session.add(new_marketplace)
         db.session.commit()
-        send_new_marketplace_email(user.email,user_id,"Shopee")
+        send_new_marketplace_email(user.email, user_id, "Shopee")
 
         responseObject = {
             'status': 'success',
             'message': 'Marketplaces connected successfully',
             'shopee_shop_id': shop_id
+        }
+
+        return make_response(jsonify(responseObject)), 201
+
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'Authentication failed'
+        }
+        return make_response(jsonify(responseObject)), 401
+
+
+@marketplaces_api_blueprint.route('/delete', methods=['DELETE'])
+def destroy():
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'No authorization header found'
+        }
+
+        return make_response(jsonify(responseObject)), 401
+
+    user_id = User.decode_auth_token(auth_token)
+
+    user = User.query.get(user_id)
+
+    if user:
+        marketplace_name = request.get_json().get('marketplace_name')
+        deleted_marketplace = Marketplace.query.filter_by(
+            marketplace_name=marketplace_name, user_id=user_id).first()
+        db.session.delete(deleted_marketplace)
+        db.session.commit()
+
+        responseObject = {
+            'status': 'success',
+            'message': 'Marketplaces deleted successfully',
         }
 
         return make_response(jsonify(responseObject)), 201

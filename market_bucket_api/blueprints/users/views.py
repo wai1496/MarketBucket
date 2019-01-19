@@ -34,11 +34,11 @@ def create():
     if len(new_user.validation_errors) > 0:
 
         responseObject = {
-            'status': 'fail',
+            'status': 'failed',
             'message': new_user.validation_errors
         }
 
-        return make_response(jsonify(responseObject)), 401
+        return make_response(jsonify(responseObject)), 400
 
     else:
         db.session.add(new_user)
@@ -80,6 +80,57 @@ def show():
         del user.__dict__['_sa_instance_state']
         del user.__dict__['password_hash']
         return jsonify(user.__dict__)
+
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'Authentication failed'
+        }
+
+        return make_response(jsonify(responseObject)), 401
+
+
+@users_api_blueprint.route('/update', methods=['PUT'])
+def edit():
+    auth_header = request.headers.get('Authorization')
+
+    if auth_header:
+        auth_token = auth_header.split(" ")[1]
+    else:
+        responseObject = {
+            'status': 'failed',
+            'message': 'No authorization header found'
+        }
+
+        return make_response(jsonify(responseObject)), 401
+
+    user_id = User.decode_auth_token(auth_token)
+    editted_user = User.query.get(user_id)
+
+    if editted_user:
+        form = request.get_json()
+        editted_user.first_name = form['first_name']
+        editted_user.last_name = form['last_name']
+        editted_user.email = form['email']
+        editted_user.store_name = form['store_name']
+        if form['password']:
+            editted_user.set_password(form['password'])
+
+        if len(editted_user.validation_errors) == 0:
+            db.session.add(editted_user)
+            db.session.commit()
+
+            responseObject = {
+                'status': 'success',
+                'message': 'User details updated successfully'
+            }
+            return make_response(jsonify(responseObject)), 200
+        else:
+            responseObject = {
+                'status': 'failed',
+                'message': editted_user.validation_errors
+            }
+        return make_response(jsonify(responseObject)), 400
 
     else:
         responseObject = {
