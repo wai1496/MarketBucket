@@ -203,7 +203,7 @@ def lazada_new_product():
     user = User.query.get(user_id)
 
     if user:
-        post_data = request.get_json()
+        post_data = request.form
         access_token = Marketplace.query.filter_by(
             user_id=user_id, marketplace_name='lazada').first().access_token
         refresh_token = Marketplace.query.filter_by(
@@ -221,27 +221,75 @@ def lazada_new_product():
         weight = post_data.get('package_weight')
         width = post_data.get('package_width')
         length = post_data.get('package_length')
+
+        # grab the file
+        file = request.files["image"]
+
+        # check file size
+        if len(file.read()) > (2 * 1024 * 1024):
+
+            responseObject = {
+                'status': 'fail',
+                'message': "Max size allowed is 2 MB"
+            }
+
+            return make_response(jsonify(responseObject)), 400
+
+        # check correct extension and upload if valid
+        if file and allowed_file(file.filename):
+            file.seek(0)
+            serial_filename = f'{user_id}.{name}.{random.randint(1,100000)}.{file.filename}'
+            file.filename = secure_filename(serial_filename)
+            upload_image(file)
+
+            new_image = Image(
+                user_id=user_id,
+                image_name=str(file.filename),
+            )
+
+            db.session.add(new_image)
+            db.session.commit()
+
+        else:
+
+            responseObject = {
+                'status': 'fail',
+                'message': "Image format not supported"
+            }
+
+            return make_response(jsonify(responseObject)), 400
+
+        image = new_image.image_url
+
         client = LazopClient('https://api.lazada.com.my/rest',
                              LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET)
         laz_request = LazopRequest('/product/create')
-        laz_request.add_api_param('payload', f"<?xml version=\"1.0\" encoding=\"UTF-8\" ?> <Request>     <Product>         <PrimaryCategory>{category_id}</PrimaryCategory>         <SPUId></SPUId>         <AssociatedSku></AssociatedSku>         <Attributes>             <name>{name}</name>             <short_description>{description}</short_description>             <brand>{brand}</brand>             <model>no model</model>         </Attributes>         <Skus>             <Sku>                 <SellerSku>MarketBucket-{name}</SellerSku>                 <color_family>{color}</color_family>                 <images><image>https://steamcdn-a.akamaihd.net/steam/apps/470220/header.jpg?t=1507630376</image></images>                                  <quantity>{quantity}</quantity>                 <price>{price}</price>                 <package_length>{length}</package_length>                 <package_height>{height}</package_height>                 <package_weight>{weight}</package_weight>                 <package_width>{width}</package_width>                 <package_content>{content}</package_content>                 <tax_class>default</tax_class>                          </Sku>         </Skus>     </Product> </Request>")
+        laz_request.add_api_param('payload', f"<?xml version=\"1.0\" encoding=\"UTF-8\" ?> <Request>     <Product>         <PrimaryCategory>{category_id}</PrimaryCategory>         <SPUId></SPUId>         <AssociatedSku></AssociatedSku>         <Attributes>             <name>{name}</name>             <short_description>{description}</short_description>             <brand>{brand}</brand>             <model>no model</model>    <warranty_type>No Warranty</warranty_type>     </Attributes>         <Skus>             <Sku>                 <SellerSku>MarketBucket-{name}</SellerSku>                 <color_family>{color}</color_family>                 <images><image>{image}</image></images>                                  <quantity>{quantity}</quantity>                 <price>{price}</price>                 <package_length>{length}</package_length>                 <package_height>{height}</package_height>                 <package_weight>{weight}</package_weight>                 <package_width>{width}</package_width>                 <package_content>{content}</package_content>                 <tax_class>default</tax_class>                         </Sku>         </Skus>     </Product> </Request>")
         response = client.execute(laz_request, access_token)
         code = response.code
 
-        if code == 0:
+        if code == '0':
             send_new_product_email(user.email, user_id, name)
+            seller_sku = response.body['data']['sku_list'][0]['seller_sku']
+            request2 = LazopRequest('/images/set')
+            request2.add_api_param(
+                'payload', f'<Request>   <Product>     <Skus>       <Sku>         <SellerSku>{seller_sku}</SellerSku>         <Images>           <Image>{image}</Image>                   </Images>       </Sku>     </Skus>   </Product> </Request>')
+            response2 = client.execute(request2, access_token)
             responseObject = {
                 'status': 'success',
-                'message': response.body,
+                'message': f'{seller_sku} was added successfully to Lazada!',
             }
+            return make_response(jsonify(responseObject)), 200
+
         else:
+            field = response.body['detail'][0]['field']
+            message = response.body['detail'][0]['message']
             responseObject = {
                 'status': 'failed',
-                'message': response.body,
+                'message': f'{field}: {message}',
             }
+            return make_response(jsonify(responseObject)), 400
 
-        breakpoint()
-        return make_response(jsonify(responseObject)), 200
     else:
         responseObject = {
             'status': 'failed',
@@ -321,21 +369,21 @@ def shopee_new_product():
         price = form.get('price')
         quantity = form.get('quantity')
         weight = form.get('package_weight')
-        attribute1_id = int(form.get('attribute1Id'))
-        attribute2_id = int(form.get('attribute2Id'))
-        attribute3_id = int(form.get('attribute3Id'))
+        attribute1_id = form.get('attribute1Id')
+        attribute2_id = form.get('attribute2Id')
+        attribute3_id = form.get('attribute3Id')
         attribute1_value = form.get('attribute1Value')
         attribute2_value = form.get('attribute2Value')
         attribute3_value = form.get('attribute3Value')
-        if attribute2_id == {}:
+        if attribute2_id == '':
             attributes = [
-                {"attributes_id": attribute1_id, "value": attribute1_value}]
-        elif attribute3_id == {}:
-            attributes = [{"attributes_id": attribute1_id, "value": attribute1_value}, {
-                "attributes_id": attribute2_id, "value": attribute2_value}]
+                {"attributes_id": int(attribute1_id), "value": attribute1_value}]
+        elif attribute3_id == '':
+            attributes = [{"attributes_id": int(attribute1_id), "value": attribute1_value}, {
+                "attributes_id": int(attribute2_id), "value": attribute2_value}]
         else:
-            attributes = [{"attributes_id": attribute1_id, "value": attribute1_value}, {
-                "attributes_id": attribute2_id, "value": attribute2_value}, {"attributes_id": attribute3_id, "value": attribute3_value}]
+            attributes = [{"attributes_id": int(attribute1_id), "value": attribute1_value}, {
+                "attributes_id": int(attribute2_id), "value": attribute2_value}, {"attributes_id": int(attribute3_id), "value": attribute3_value}]
         # grab the file
         file = request.files["image"]
 
@@ -376,7 +424,7 @@ def shopee_new_product():
         shop_id = Marketplace.query.filter_by(
             user_id=user_id, marketplace_name='shopee').first().shop_id
         endpoint = "https://partner.shopeemobile.com/api/v1/item/add"
-        request_body = json.dumps({"shopid": shop_id, "category_id": int(category_id), 'name': name, 'description': description, 'price': int(price), 'stock': int(quantity), 'images': [{'url': new_image.image_url}], "attributes": attributes, "logistics": [{"logistic_id": 29210, "enabled": True}], "weight": int(weight), "partner_id": int(SHOPEE_APP_ID), "timestamp": int(
+        request_body = json.dumps({"shopid": shop_id, "category_id": int(category_id), 'name': name, 'description': description, 'price': float(price), 'stock': int(quantity), 'images': [{'url': new_image.image_url}], "attributes": attributes, "logistics": [{"logistic_id": 29210, "enabled": True}], "weight": float(weight), "partner_id": int(SHOPEE_APP_ID), "timestamp": int(
             time.time())})
         signature = hmac.new(
             key=bytes(SHOPEE_APP_KEY, encoding="ascii"),
@@ -392,16 +440,17 @@ def shopee_new_product():
         except:
             responseObject = {
                 'status': 'failed',
-                'message': response.json(),
+                'message': response.json()['msg'],
             }
+            return make_response(jsonify(responseObject)), 400
+
         else:
             send_new_product_email(user.email, user_id, name)
             responseObject = {
                 'status': 'success',
-                'message': response.json(),
+                'message': response.json()['msg'],
             }
-
-        return make_response(jsonify(responseObject)), 200
+            return make_response(jsonify(responseObject)), 200
 
     else:
         responseObject = {

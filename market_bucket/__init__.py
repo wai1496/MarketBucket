@@ -79,7 +79,7 @@ oauth.init_app(app)
 
 # S3 initialisation and upload setup
 S3_BUCKET = config.S3_BUCKET
-S3_LOCATION = f'http://{S3_BUCKET}.s3.amazonaws.com/'
+S3_LOCATION = f'https://s3.amazonaws.com/{S3_BUCKET}/'
 S3_KEY = config.S3_KEY
 S3_SECRET = config.S3_SECRET
 
