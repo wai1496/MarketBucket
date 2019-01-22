@@ -36,7 +36,7 @@ def load_user(user_id):
 config = eval((os.environ['APP_SETTINGS']))
 oauth = OAuth()
 GOOGLE_REDIRECT_URI = os.environ['GOOGLE_REDIRECT_URI']
-LAZADA_REDIRECT_URI = os.environ['LAZADA_REDIRECT_URI']
+LAZADA_REDIRECT_URI = os.environ['LAZADA_REDIRECT_URI_PROD']
 
 google = oauth.register('google',
                         client_id=config.GOOGLE_CLIENT_ID,
@@ -66,7 +66,7 @@ lazada = oauth.register('lazada',
                         )
 
 shopee = oauth.register('shopee',
-                        authorize_url=f'https://partner.shopeemobile.com/api/v1/shop/auth_partner?id={config.SHOPEE_APP_ID}&token={config.SHOPEE_APP_TOKEN}&redirect=https://www.localhost:3000/',
+                        authorize_url=f'https://partner.shopeemobile.com/api/v1/shop/auth_partner?id={config.SHOPEE_APP_ID}&token={config.SHOPEE_APP_TOKEN}&redirect={config.SHOPEE_REDIRECT_URI}',
                         client_kwargs={
                             'scope': '',
                             'token_endpoint_auth_method': 'client_secret_basic',

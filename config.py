@@ -26,7 +26,8 @@ class ProductionConfig(Config):
     LAZADA_MARKET_SECRET = os.environ['LAZADA_MARKET_APP_SECRET']
     SHOPEE_APP_ID = os.environ['SHOPEE_APP_ID']
     SHOPEE_APP_KEY = os.environ['SHOPEE_APP_KEY']
-    SHOPEE_APP_TOKEN = os.environ['SHOPEE_APP_TOKEN']
+    SHOPEE_APP_TOKEN = os.environ['SHOPEE_APP_TOKEN_PROD']
+    SHOPEE_REDIRECT_URI = os.environ['SHOPEE_REDIRECT_URI_PROD']
     SENDGRID_API_KEY = os.environ['SENDGRID_API_KEY']
 
 
@@ -54,6 +55,7 @@ class DevelopmentConfig(Config):
     SHOPEE_APP_ID = os.environ['SHOPEE_APP_ID']
     SHOPEE_APP_KEY = os.environ['SHOPEE_APP_KEY']
     SHOPEE_APP_TOKEN = os.environ['SHOPEE_APP_TOKEN']
+    SHOPEE_REDIRECT_URI = os.environ['SHOPEE_REDIRECT_URI']
     SENDGRID_API_KEY = os.environ['SENDGRID_API_KEY']
 
 
