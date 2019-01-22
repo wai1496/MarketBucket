@@ -36,7 +36,7 @@ def load_user(user_id):
 config = eval((os.environ['APP_SETTINGS']))
 oauth = OAuth()
 GOOGLE_REDIRECT_URI = os.environ['GOOGLE_REDIRECT_URI']
-LAZADA_REDIRECT_URI = os.environ['LAZADA_REDIRECT_URI_PROD']
+LAZADA_REDIRECT_URI = os.environ['LAZADA_REDIRECT_URI']
 
 google = oauth.register('google',
                         client_id=config.GOOGLE_CLIENT_ID,
