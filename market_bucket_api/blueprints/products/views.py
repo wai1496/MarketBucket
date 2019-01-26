@@ -432,7 +432,6 @@ def shopee_new_product():
             digestmod=hashlib.sha256).hexdigest()
         headers = {'Authorization': signature}
         response = requests.post(endpoint, headers=headers, data=request_body)
-        breakpoint()
 
         try:
             response.json()['item_id']
