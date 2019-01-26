@@ -2,7 +2,7 @@ from market_bucket.marketplaces.model import Marketplace, db
 from flask import redirect, url_for, render_template, Blueprint, flash, request
 from flask_login import current_user, login_required
 from market_bucket.helpers.lazada_sdk.lazop.base import LazopClient, LazopRequest, LazopResponse
-from market_bucket import LAZADA_TEST_KEY, LAZADA_TEST_SECRET, LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, oauth
+from market_bucket import LAZADA_MARKET_KEY, LAZADA_MARKET_SECRET, LAZADA_REDIRECT_URI, lazada, oauth
 
 marketplaces_blueprint = Blueprint(
     'marketplaces', __name__, template_folder='templates')

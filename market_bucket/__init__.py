@@ -36,7 +36,7 @@ def load_user(user_id):
 config = eval((os.environ['APP_SETTINGS']))
 oauth = OAuth()
 GOOGLE_REDIRECT_URI = os.environ['GOOGLE_REDIRECT_URI']
-LAZADA_REDIRECT_URI = os.environ['LAZADA_REDIRECT_URI']
+LAZADA_REDIRECT_URI = config.LAZADA_REDIRECT_URI
 
 google = oauth.register('google',
                         client_id=config.GOOGLE_CLIENT_ID,
@@ -92,14 +92,10 @@ SENDGRID_API_KEY = config.SENDGRID_API_KEY
 sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
 
 # Lazada app keys
-LAZADA_TEST_KEY = config.LAZADA_TEST_KEY
-LAZADA_TEST_SECRET = config.LAZADA_TEST_SECRET
 LAZADA_MARKET_KEY = config.LAZADA_MARKET_KEY
 LAZADA_MARKET_SECRET = config.LAZADA_MARKET_SECRET
 
 # Shopee app keys
-SHOPEE_TEST_ID = config.SHOPEE_TEST_ID
-SHOPEE_TEST_KEY = config.SHOPEE_TEST_KEY
 SHOPEE_APP_ID = config.SHOPEE_APP_ID
 SHOPEE_APP_KEY = config.SHOPEE_APP_KEY
 

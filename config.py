@@ -22,14 +22,14 @@ class ProductionConfig(Config):
     S3_LOCATION = f'http://{S3_BUCKET}.s3.amazonaws.com/'
     S3_KEY = os.environ['S3_ACCESS_KEY']
     S3_SECRET = os.environ['S3_SECRET_ACCESS_KEY']
-    LAZADA_MARKET_KEY = os.environ['LAZADA_MARKET_APP_KEY']
-    LAZADA_MARKET_SECRET = os.environ['LAZADA_MARKET_APP_SECRET']
+    LAZADA_MARKET_KEY = os.environ['LAZADA_MARKET_APP_KEY_PROD']
+    LAZADA_MARKET_SECRET = os.environ['LAZADA_MARKET_APP_SECRET_PROD']
+    LAZADA_REDIRECT_URI = os.environ['LAZADA_REDIRECT_URI_PROD']
     SHOPEE_APP_ID = os.environ['SHOPEE_APP_ID']
     SHOPEE_APP_KEY = os.environ['SHOPEE_APP_KEY']
     SHOPEE_APP_TOKEN = os.environ['SHOPEE_APP_TOKEN_PROD']
     SHOPEE_REDIRECT_URI = os.environ['SHOPEE_REDIRECT_URI_PROD']
     SENDGRID_API_KEY = os.environ['SENDGRID_API_KEY']
-
 
 
 class StagingConfig(Config):
@@ -46,12 +46,9 @@ class DevelopmentConfig(Config):
     S3_LOCATION = f'http://{S3_BUCKET}.s3.amazonaws.com/'
     S3_KEY = os.environ['S3_ACCESS_KEY']
     S3_SECRET = os.environ['S3_SECRET_ACCESS_KEY']
-    LAZADA_TEST_KEY = os.environ['LAZADA_TEST_APP_KEY']
-    LAZADA_TEST_SECRET = os.environ['LAZADA_TEST_APP_SECRET']
     LAZADA_MARKET_KEY = os.environ['LAZADA_MARKET_APP_KEY']
     LAZADA_MARKET_SECRET = os.environ['LAZADA_MARKET_APP_SECRET']
-    SHOPEE_TEST_ID = os.environ['SHOPEE_TEST_ID']
-    SHOPEE_TEST_KEY = os.environ['SHOPEE_TEST_KEY']
+    LAZADA_REDIRECT_URI = os.environ['LAZADA_REDIRECT_URI']
     SHOPEE_APP_ID = os.environ['SHOPEE_APP_ID']
     SHOPEE_APP_KEY = os.environ['SHOPEE_APP_KEY']
     SHOPEE_APP_TOKEN = os.environ['SHOPEE_APP_TOKEN']
